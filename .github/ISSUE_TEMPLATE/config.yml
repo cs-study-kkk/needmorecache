@@ -1,0 +1,27 @@
+blank_issues_enabled: false
+
+issue_template:
+  - name: "🐞 Bug"
+    description: "버그 수정 템플릿을 사용하여 문제를 보고하세요."
+    labels: ["bug"]
+    file: bug.yml
+
+  - name: "✨ Feature"
+    description: "새로운 기능 추가를 제안하거나 구현할 때 사용하세요."
+    labels: ["feat"]
+    file: feature.yml
+
+  - name: "🔧 Refactor"
+    description: "기능 변경 없이 코드 구조를 개선할 때 사용하세요. (예: 중복 제거, 가독성 향상)"
+    labels: ["refactor"]
+    file: refactor.yml
+
+  - name: "⚙️ Setting"
+    description: "프로젝트 설정 변경 (환경 변수, 의존성, Gradle 파일 등)을 요청할 때 사용하세요."
+    labels: ["setting"]
+    file: setting.yml
+
+  - name: "📚 Docs"
+    description: "문서화 작업이 필요할 때 사용하세요."
+    labels: ["docs"]
+    file: docs.yml

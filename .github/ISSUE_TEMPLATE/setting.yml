@@ -1,0 +1,33 @@
+name: "⚙️ Setting"
+description: "프로젝트 설정 변경 (환경 변수, 의존성, 린트/포맷 규칙 등)을 요청합니다."
+title: "[setting] "
+labels: ["setting"]
+body:
+  - type: textarea
+    attributes:
+      label: 📄 설명
+      description: |
+        어떤 설정 변경이 필요한지 자세히 설명해 주세요.
+        예: 개발 환경에서 특정 API 키를 사용해야 함, 의존성 라이브러리 버전 업데이트
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 설정 변경 내용
+      description: |
+        구체적인 변경 내용을 체크박스 형태로 작성해주세요.
+        예:
+        - [ ] `.env.development`에 `API_KEY_TEST` 추가
+        - [ ] `package.json`의 `axios` 버전을 `^1.0.0`으로 업데이트
+        - [ ] ESLint 규칙에 세미콜론 사용 설정 (semi: always) 추가
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 💡 참고 자료/영향
+      description: |
+        설정 변경이 필요한 이유, 참고 문서 또는 변경으로 인해 예상되는 영향을 작성해 주세요.
+        예:
+        - 보안 강화를 위해 환경 변수 이름을 변경함.
+        - 특정 버그 해결을 위해 라이브러리 버전 업데이트가 필요함. (참고: #123)
+        참고 자료가 없는 경우 `_No response_`로 작성해 주세요.

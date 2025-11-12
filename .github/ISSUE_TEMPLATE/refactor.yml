@@ -1,0 +1,33 @@
+name: "🔧 Refactor"
+description: "코드 리펙토링 (제목은 'refactor: 명령 응답 로직 공통화' 형태로 입력해 주세요)"
+title: "[refactor] "
+labels: ["refactor"]
+body:
+  - type: textarea
+    attributes:
+      label: 📄 설명
+      description: |
+        리팩토링할 기능에 대한 설명을 작성해 주세요.
+        예: ClientHandler에서 명령 처리 후 클라이언트에게 응답하는 "OK", "VALUE", "ERROR" 문자열 생성 로직이 중복되어 이를 Utils 함수로 추출
+        예: CommandParser의 명령 파싱 로직이 복잡하여 Enum 기반의 패턴 매칭으로 개선
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 설정 내용
+      description: |
+        리팩토링할 내용을 체크박스 형태로 작성해주세요.
+        예:
+        - [ ] ClientHandler 및 CommandParser의 응답 문자열 생성 부분을 com.common.Utils로 이동
+        - [ ] CacheStore의 set/get/del 메소드에서 발생하는 예외 처리 방식 통일
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 💡 참고 자료
+      description: |
+        참고 자료가 있다면 작성해 주세요.
+        예:
+        - 기존 코드 위치 링크
+        - 리팩토링 관련 문서 (예: Fowler의 Refactoring)
+        참고 자료가 없는 경우 `_No response_`로 작성해 주세요.

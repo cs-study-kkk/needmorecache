@@ -1,0 +1,16 @@
+name: "📚 Docs"
+description: "문서 작업 (제목은 '[Docs] README.md 지원 명령어 섹션 업데이트' 형태로 입력해 주세요)"
+title: "[Docs] "
+labels: ["docs"]
+body:
+  - type: textarea
+    attributes:
+      label: ✏️ 문서
+      description: |
+        작업 내용을 체크박스 형태로 작성해주세요.
+        예:
+        - [ ] README.md의 역할 분담(A, B 역할) 최신화
+        - [ ] Mini Redis의 간단한 프로토콜 (텍스트 기반) 명세 초안 작성
+        - [ ] TTLManager의 주기적인 만료 처리 방식 설명 추가
+    validations:
+      required: true

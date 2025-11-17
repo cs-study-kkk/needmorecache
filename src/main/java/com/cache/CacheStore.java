@@ -18,11 +18,9 @@ public class CacheStore<K, V> {
     public V get(K key) {
         CacheEntry<V> entry = store.get(key);
 
-        if (entry == null) return null;
-        if (entry.isExpired()) {
-            store.remove(key);
+        if (entry == null || checkAndEvictIfExpired(key, entry))
             return null;
-        }
+
         return entry.getValue();
     }
 
@@ -37,16 +35,21 @@ public class CacheStore<K, V> {
     public long ttl(K key) {
         CacheEntry<V> entry = store.get(key);
 
-        if (entry == null) return -1;
-        if (entry.isExpired()) {
-            store.remove(key);
+        if (entry == null || checkAndEvictIfExpired(key, entry))
             return -1;
-        }
 
         return entry.getRemainingTTL();
     }
 
     public void clear() {
         store.clear();
+    }
+
+    private boolean checkAndEvictIfExpired(K key, CacheEntry<V> entry){
+        if (entry != null && entry.isExpired()) {
+            store.remove(key);
+            return true;
+        }
+        return false;
     }
 }

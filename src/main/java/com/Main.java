@@ -1,17 +1,44 @@
 package com;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import com.server.RedisServer;
+import com.server.ServerConfig;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        // Example:
+        //   ./gradlew run --args="--port=6380 --workers=32"
+        //   (IntelliJ → Run Configuration → Program arguments)
+        // This builds ServerConfig from CLI args and starts RedisServer.
+        ServerConfig config = resolveConfig(args);
+        RedisServer server = new RedisServer(config);
+        server.start();
+    }
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+    private static ServerConfig resolveConfig(String[] args) {
+        ServerConfig.Builder builder = ServerConfig.builder();
+
+        for (String arg : args) {
+            if (arg.startsWith("--port=")) {
+                builder.port(parsePositiveInt(arg.substring(7), "port"));
+            } else if (arg.startsWith("--backlog=")) {
+                builder.backlog(parsePositiveInt(arg.substring(10), "backlog"));
+            } else if (arg.startsWith("--workers=")) {
+                builder.workerThreads(parsePositiveInt(arg.substring(10), "workers"));
+            }
+        }
+
+        return builder.build();
+    }
+
+    private static int parsePositiveInt(String value, String name) {
+        try {
+            int parsed = Integer.parseInt(value);
+            if (parsed <= 0) {
+                throw new IllegalArgumentException(name + " must be positive.");
+            }
+            return parsed;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid " + name + " value: " + value, e);
         }
     }
 }

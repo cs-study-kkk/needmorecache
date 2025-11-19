@@ -2,9 +2,17 @@ package com.cache;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class CacheStore<K, V> {
+
     private final Map<K, CacheEntry<V>> store = new ConcurrentHashMap<>();
+    private final LRUCache<K> lru;
+    private final ReentrantLock lruLock = new ReentrantLock();
+
+    public CacheStore(int capacity) {
+        this.lru = new LRUCache<>(capacity);
+    }
 
     // no TTL
     public void set(K key, V value) {
@@ -13,18 +21,23 @@ public class CacheStore<K, V> {
 
     public void set(K key, V value, long ttl) {
         store.put(key, new CacheEntry<>(value, ttl));
+
+        updateLRU(key);
     }
 
     public V get(K key) {
         CacheEntry<V> entry = store.get(key);
 
-        if (entry == null || checkAndEvictIfExpired(key, entry))
+        if (checkExpired(key, entry)) {
             return null;
+        }
 
+        updateLRU(key);
         return entry.getValue();
     }
 
     public boolean del(K key) {
+        lru.remove(key);
         return store.remove(key) != null;
     }
 
@@ -35,21 +48,39 @@ public class CacheStore<K, V> {
     public long ttl(K key) {
         CacheEntry<V> entry = store.get(key);
 
-        if (entry == null || checkAndEvictIfExpired(key, entry))
+        if (checkExpired(key, entry)) {
             return -1;
+        }
 
         return entry.getRemainingTTL();
     }
 
-    public void clear() {
-        store.clear();
+    public Map<K, CacheEntry<V>> entries() {
+        return Map.copyOf(store);
     }
 
-    private boolean checkAndEvictIfExpired(K key, CacheEntry<V> entry){
-        if (entry != null && entry.isExpired()) {
+    private boolean checkExpired(K key, CacheEntry<V> entry) {
+        if (entry == null || entry.isExpired()) {
             store.remove(key);
             return true;
         }
         return false;
+    }
+
+    //LRU 처리
+    private void updateLRU(K key) {
+        lruLock.lock();
+        try {
+            lru.recordAccess(key);
+            K evict = lru.findEvictionTarget();
+
+            if (evict != null) {
+                store.remove(evict);
+                lru.remove(evict);
+                System.out.println("[LRU] evicted key: " + evict);
+            }
+        } finally {
+            lruLock.unlock();
+        }
     }
 }

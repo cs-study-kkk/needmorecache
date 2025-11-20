@@ -37,8 +37,15 @@ public class CacheStore<K, V> {
     }
 
     public boolean del(K key) {
-        lru.remove(key);
-        return store.remove(key) != null;
+        store.remove(key);
+
+        lruLock.lock();
+        try {
+            lru.remove(key);
+        } finally {
+            lruLock.unlock();
+        }
+        return true;
     }
 
     public boolean exists(K key) {
@@ -61,7 +68,6 @@ public class CacheStore<K, V> {
 
     private boolean checkExpired(K key, CacheEntry<V> entry) {
         if (entry == null || entry.isExpired()) {
-            store.remove(key);
             return true;
         }
         return false;
@@ -75,8 +81,7 @@ public class CacheStore<K, V> {
             K evict = lru.findEvictionTarget();
 
             if (evict != null) {
-                store.remove(evict);
-                lru.remove(evict);
+                del(evict);
                 System.out.println("[LRU] evicted key: " + evict);
             }
         } finally {

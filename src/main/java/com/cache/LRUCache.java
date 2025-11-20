@@ -13,19 +13,16 @@ public class LRUCache<K> {
                 true); // 75% 초과 시 재해싱
     }
 
-
-    public synchronized void recordAccess(K key) {
+    public void recordAccess(K key) {
         orderMap.put(key, Boolean.TRUE);
     }
 
-
-    public synchronized K findEvictionTarget() {
+    public K findEvictionTarget() {
         if (orderMap.size() <= capacity) return null;
         return orderMap.entrySet().iterator().next().getKey();
     }
 
-
-    public synchronized void remove(K key) {
+    public void remove(K key) {
         orderMap.remove(key);
     }
 }

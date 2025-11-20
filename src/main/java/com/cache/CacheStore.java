@@ -1,5 +1,7 @@
 package com.cache;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -51,5 +53,9 @@ public class CacheStore<K, V> {
             return true;
         }
         return false;
+    }
+
+    public Map<K, CacheEntry<V>> dumpAll() {
+        return Collections.unmodifiableMap(new HashMap<>(store));
     }
 }

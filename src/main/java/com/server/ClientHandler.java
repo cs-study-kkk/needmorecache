@@ -9,9 +9,11 @@ import java.net.Socket;
 
 public class ClientHandler implements Runnable {
     private final Socket socket;
+    private final CommandParser commandParser;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket, CommandParser commandParser) {
         this.socket = socket;
+        this.commandParser = commandParser;
     }
 
     @Override
@@ -25,20 +27,15 @@ public class ClientHandler implements Runnable {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                String response = handleCommand(line);
-                writer.write(response + "\r\n");
+                CommandResult result = commandParser.handle(line);
+                writer.write(result.response() + "\r\n");
                 writer.flush();
+                if (result.shouldClose()) {
+                    break;
+                }
             }
         } catch (IOException e) {
             System.out.println("Client disconnected: " + e.getMessage());
         }
-    }
-
-    private String handleCommand(String line) {
-        return switch (line.trim().toUpperCase()) {
-            case "PING" -> "+PONG";
-            case "QUIT" -> "+BYE";
-            default -> "-ERR unknown command";
-        };
     }
 }

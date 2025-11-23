@@ -1,16 +1,20 @@
 package com.cache;
 
+import com.cache.dto.SnapshotData;
+
+import java.io.Serializable;
+import java.util.List;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class CacheStore<K, V> {
+public class CacheStore<K, V> implements Serializable {
 
     private final Map<K, CacheEntry<V>> store = new ConcurrentHashMap<>();
     private final LRUCache<K> lru;
-    private final ReentrantLock lruLock = new ReentrantLock();
+    private final transient ReentrantLock lruLock = new ReentrantLock();
 
     public CacheStore(int capacity) {
         this.lru = new LRUCache<>(capacity);
@@ -66,6 +70,26 @@ public class CacheStore<K, V> {
 
     public Map<K, CacheEntry<V>> entries() {
         return Map.copyOf(store);
+    }
+
+    public void restoreFromSnapshot(Map<K, CacheEntry<V>> restoredStore, List<K> restoredLruKeys) {
+        this.store.clear();
+        this.store.putAll(restoredStore);
+
+        this.lru.restoreOrder(restoredLruKeys);
+
+        System.out.println("[Snapshot] CacheStore restored successfully. Keys: " + this.store.size());
+    }
+
+    public SnapshotData<K, V> getSnapshotData() {
+        lruLock.lock();
+        try {
+            Map<K, CacheEntry<V>> data = Map.copyOf(store);
+            List<K> keys = lru.getKeysInAccessOrder();
+            return new SnapshotData<>(data, keys);
+        } finally {
+            lruLock.unlock();
+        }
     }
 
     private boolean checkExpired(K key, CacheEntry<V> entry) {

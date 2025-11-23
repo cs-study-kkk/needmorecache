@@ -1,6 +1,8 @@
 package com.cache;
 
-public class CacheEntry<T> {
+import java.io.Serializable;
+
+public class CacheEntry<T> implements Serializable {
     private final T value;
     private final long expireAt; // ex) currentTimeMillis + 1000ms
 

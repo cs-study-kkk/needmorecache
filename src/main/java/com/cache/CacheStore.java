@@ -4,6 +4,8 @@ import com.cache.dto.SnapshotData;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -97,6 +99,8 @@ public class CacheStore<K, V> implements Serializable {
         return false;
     }
 
+    public Map<K, CacheEntry<V>> dumpAll() {
+        return Collections.unmodifiableMap(new HashMap<>(store));
     //LRU 처리
     private void updateLRU(K key) {
         lruLock.lock();

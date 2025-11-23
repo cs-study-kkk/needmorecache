@@ -1,5 +1,7 @@
 package com.server;
 
+import com.cache.CacheStore;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,10 +11,13 @@ import java.util.concurrent.Executors;
 public class RedisServer {
     private final ServerConfig config;
     private final ExecutorService clientPool;
+    private final CommandParser commandParser;
 
     public RedisServer(ServerConfig config) {
         this.config = config;
         this.clientPool = Executors.newFixedThreadPool(config.workerThreads());
+        CacheStore<String, String> cacheStore = new CacheStore<>();
+        this.commandParser = new CommandParser(cacheStore);
     }
 
     public static RedisServer createDefault() {
@@ -37,7 +42,7 @@ public class RedisServer {
     private void acceptLoop(ServerSocket serverSocket) throws IOException {
         while (!Thread.currentThread().isInterrupted()) {
             Socket client = serverSocket.accept();
-            clientPool.submit(new ClientHandler(client));
+            clientPool.submit(new ClientHandler(client, commandParser));
         }
     }
 }

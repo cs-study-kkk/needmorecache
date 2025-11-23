@@ -1,8 +1,11 @@
 package com.cache;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class LRUCache<K> {
+public class LRUCache<K> implements Serializable {
     private final int capacity;
     private final LinkedHashMap<K, Boolean> orderMap;
 
@@ -24,5 +27,16 @@ public class LRUCache<K> {
 
     public void remove(K key) {
         orderMap.remove(key);
+    }
+
+    public List<K> getKeysInAccessOrder() {
+        return orderMap.keySet().stream().collect(Collectors.toList());
+    }
+
+    public void restoreOrder(List<K> keys) {
+        orderMap.clear();
+        for (K key : keys) {
+            orderMap.put(key, Boolean.TRUE);
+        }
     }
 }
